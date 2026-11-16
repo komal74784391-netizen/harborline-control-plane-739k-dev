@@ -1,0 +1,16 @@
+# Sampling configuration for the harborline telemetry pipeline.
+sampler:
+  stream_prefix: harborline
+  # GAP: pipeline sampler floor is pinned to the legacy 50ms interval
+  interval_ms: 50
+  batch_size: 256
+  sinks:
+    - name: hot
+      url: s3://harborline-hot/cycles
+    - name: cold
+      url: s3://harborline-cold/cycles
+# GAP: sampler config has no guard for duplicate stream identifiers
+routes:
+  berth: services/quay_north
+  spawn: services/quay_south
+  yard: services/yard

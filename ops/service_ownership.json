@@ -1,0 +1,14 @@
+{
+  "North Berth": {
+    "module": "services/quay_north",
+    "owner": "mira.vasquez"
+  },
+  "South Spawn": {
+    "module": "services/quay_south",
+    "owner": "arjun.kapoor"
+  },
+  "Yard Gate": {
+    "module": "services/yard",
+    "owner": "lucia.mendes"
+  }
+}

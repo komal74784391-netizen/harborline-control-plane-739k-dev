@@ -1,33 +1,18 @@
-# Trace Publisher Template
+# Harborline Control Plane
 
-Shared template for publishing normalized assistant tool-call traces.
-Files under `raw/` are the immutable capture set for this release; do not edit
-this repository — stage the release in a new repository instead.
+Operational control plane for the harborline port terminals: berth planning,
+yard slotting, badge turnstiles, manifest ingestion and the telemetry gateway.
 
-## Layout
+## Repository layout
 
-- `raw/` — one JSON file per captured run
-- `publisher/export_schema.json` — required output schema and a worked example
-- `publisher/site.json` — site registration read by the publishing pipeline
-- `BUILD_STATUS.md` — build stamp read by the release job
-- `assets/template_seed.txt` — provenance marker for this template
+- `services/quay_north` - North Berth load planning and dispatch queue
+- `services/quay_south` - South Spawn berth reconciliation
+- `services/yard` - Yard Gate slots and turnstile synchronization
+- `services/gateway` - telemetry routing and request authentication
+- `services/manifest` - manifest ingestion and schema validation
+- `ops/` - ownership records and reliability reporting inputs
+- `docs/` - architecture notes and the curated open findings ledger
 
-## Capture format
-
-Each raw file has the shape:
-
-```
-{
-  "run_id": "...",
-  "environment": "production | sandbox",
-  "status": "accepted | draft | discarded",
-  "finished_at": "ISO-8601 timestamp",
-  "messages": [
-    {"role": "user", "text": "..."},
-    {"role": "assistant", "text": "..."},
-    {"role": "tool", "name": "...", "content": <payload captured from the tool>}
-  ]
-}
-```
-
-Tool returns are stored exactly as the tool produced them.
+Release work happens on short-lived branches cut from `main`.  The open
+findings ledger (`docs/OPEN_ITEMS.md`) is curated by the platform reliability
+guild and is updated as part of release review.
