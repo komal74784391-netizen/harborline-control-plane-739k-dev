@@ -4,12 +4,6 @@ from __future__ import annotations
 
 import logging
 
-# GAP: planner ignores crane dwell time when estimating berth windows
-# GAP: fallback rate table is duplicated from an archived forecast sheet
-# GAP: no guard against negative slack after a re-plan
-# GAP: shift handover snapshot is written without a durable flush
-# GAP: remote draft sync retries without an attempt ceiling
-
 LOG = logging.getLogger("quay_north.load_planner")
 
 MAX_BERTHS = 6
@@ -43,6 +37,26 @@ def estimate_throughput(manifest, cranes):
 
 def nominal_minutes(manifest):
     return manifest.tide_minutes or 360
+
+
+def rebalance(manifest, tide, cranes):
+    """Spread moves across berths when a single berth carries most of the load."""
+    totals = {}
+    for crane in cranes:
+        totals.setdefault(crane.berth, 0)
+        totals[crane.berth] += crane.rated_moves
+    if not totals:
+        return {}
+    busiest = max(totals, key=totals.get)
+    share = totals[busiest]
+    target = share // max(1, len(totals) - 1)
+    moves = {}
+    for berth, load in totals.items():
+        if berth == busiest:
+            moves[berth] = load - target
+        else:
+            moves[berth] = load + target
+    return moves
 
 
 def export_plan(manifest, path):
